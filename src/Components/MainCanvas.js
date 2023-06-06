@@ -22,16 +22,19 @@ class CanvasHome extends Component {
 		this.scene		=	null;
 		this.camera		=	null;
 		this.renderer	=	null;
-		this.cube		=	null;
 		this.light		=	null;
 		this.frameId	=	null;
 
 		//Variables
 		this.Right_FemurModel	=	null;
 		this.Right_TibiaModel	=	null;
+		
+		this.mesh = null;
 
-		this.landmark_femurCentre		=	null;
+		this.landmark_femurCentre	=	null;
 		this.landmark_hipCenter		=	null;
+		this.landmark_lateralEpicondyle	=	null;
+
 		this.points			=	[];
 		this.raycaster		=	null;
 		this.pointer		=	null;
@@ -113,8 +116,8 @@ class CanvasHome extends Component {
 		switch(event.keyCode)
 		{
 			case 70:	//F or f
-				if(this.landmark_hipCenter){
-					console.log("-----x ",this.landmark_hipCenter.position);
+				if(this.landmark_lateralEpicondyle){
+					console.log("-----x ",this.landmark_lateralEpicondyle.position);
 				
 				}
 		
@@ -205,7 +208,6 @@ class CanvasHome extends Component {
 	//Setting up lights
 	setupLights = () => {
 		//Local variable declaration
-
 		
 	};	
 
@@ -221,33 +223,44 @@ class CanvasHome extends Component {
 	//Draw Geometries in scene
 	draw = () => {
 		//Local variable declaration
-		const geometry_L1		=	new THREE.SphereGeometry( 1.5, 32, 32);
-		const material_L1		=	new THREE.MeshBasicMaterial( {side:THREE.DoubleSide,color: "grey" } );
-
 		const geometry_L2		=	new THREE.SphereGeometry( 1.5, 32, 32);
 		const material_L2		=	new THREE.MeshBasicMaterial( { color: "grey" } );
 
 		//LANDMARK-Fem Centre
-		this.landmark_femurCentre		=	new THREE.Mesh(geometry_L1, material_L1);
-		this.landmark_femurCentre.name	=	"FemurCentre";
-		this.landmark_femurCentre.material.color.set('black');
-		transformControl.attach(this.landmark_femurCentre);
-		// let rBtn = document.getElementsByClassName("femCentre");
-
-		// this.landmark_femurCentre.visible	=	false;
-		this.landmark_femurCentre.position.set(-11.49667183472847, 29.702493960430466, 20.29713010148908);
-		objects.push(this.landmark_femurCentre);
-		this.scene.add(this.landmark_femurCentre);
+		this.drawLandMark(new THREE.Vector3(-11.49667183472847, 29.702493960430466, 20.29713010148908), "FemurCentre");
+		
+		//LANDMARK-Hip Centre
+		this.drawLandMark(new THREE.Vector3(-14.586308904469398, 104.37238282070668, 23.174603530337727), "HipCentre");
 
 		//LANDMARK-Hip Centre
-		this.landmark_hipCenter		=	new THREE.Mesh(geometry_L2, material_L2);
-		this.landmark_hipCenter.name	=	"HipCentre";
-		this.landmark_hipCenter.position.set(-14.586308904469398, 104.37238282070668, 23.174603530337727);
-		objects.push(this.landmark_hipCenter);
-		this.scene.add(this.landmark_hipCenter);
+		this.drawLandMark(new THREE.Vector3(-10.586308904469398, 104.37238282070668, 23.174603530337727), "LateralEpicondyle");
+
+
+		//LANDMARK-Hip Centre
+		this.landmark_lateralEpicondyle		=	new THREE.Mesh(geometry_L2, material_L2);
+		this.landmark_lateralEpicondyle.name	=	"LateralEpicondyle";
+		this.landmark_lateralEpicondyle.position.set(-10.586308904469398, 104.37238282070668, 23.174603530337727);
+		objects.push(this.landmark_lateralEpicondyle);
+		this.scene.add(this.landmark_lateralEpicondyle);
 
 		
 	};
+
+	//Draw LandMark
+	drawLandMark = (position, name) =>{
+		const geometry	= new THREE.SphereGeometry( 1.5, 32, 32);
+		this.mesh		= new THREE.Mesh(geometry ,new THREE.MeshBasicMaterial( { color: "grey" } ));
+
+		this.mesh.position.copy(position);
+		this.mesh.name = name;
+
+		this[`landmark${name}`] = this.mesh;
+
+
+		objects.push(this[`landmark${name}`]);
+
+		this.scene.add(this[`landmark${name}`]);
+	}
 
 	//Start Animation
 	start = () => {
@@ -296,35 +309,62 @@ class CanvasHome extends Component {
 		this.frameId = window.requestAnimationFrame(this.update);
 	};
 
+	handleClickOnRadio = (event,name) =>{
+		//code
+			console.log("---------------",this[`landmark${name}`].name);
+		if(name = "FemurCentre"){
+			console.log("-----111111-");
+		
+			this[`landmark${name}`].material.color.set("red");
+			transformControl.attach(this[`landmark${name}`]);
+		}
+		else if(name = "HipCentre"){
+			console.log("-----222222222-");
+			this[`landmark${name}`].material.color.set("green");
+			transformControl.attach(this[`landmark${name}`]);
+		}
+	}
+
 	//Handle onClick Femur button
 	handleFemCentre = (event) => {
-		//Local variable declaration
-
 		//Code
-		this.landmark_femurCentre.visible	=	true;
 		this.landmark_femurCentre.material.color.set('black');
 		
 		transformControl.attach(this.landmark_femurCentre);
-		if (this.landmark_hipCenter.visible === true) {
-			this.landmark_femurCentre.material.color.set('black');
-			this.landmark_hipCenter.material.color.set('darkgrey');
-		}
+		
+		// this.landmark_femurCentre.material.color.set('black');
+		// this.landmark_hipCenter.material.color.set('darkgrey');
+		// this.landmark_lateralEpicondyle.material.color.set('darkgrey');
+		
 	};
 
 	//Handle onClick Hip button
 	handleHipCentre = () => {
-		//Local variable declaration
-
 		//Code
-		this.landmark_hipCenter.visible	=	true;
 		this.landmark_hipCenter.material.color.set('black');
-
+		
 		transformControl.attach(this.landmark_hipCenter);
+		
+		// this.landmark_hipCenter.material.color.set('black');
+		// this.landmark_femurCentre.material.color.set('darkgrey');
+		// this.landmark_lateralEpicondyle.material.color.set('darkgrey');
 
-		if (this.landmark_femurCentre.visible === true) {
+		
+	};
+
+	//Handle onClick Lateral Epicondyle
+	handleLateralEpicondyle = () => {
+		//Code
+		this.landmark_lateralEpicondyle.visible	=	true;
+		this.landmark_lateralEpicondyle.material.color.set('black');
+
+		transformControl.attach(this.landmark_lateralEpicondyle);
+
+		
 			this.landmark_femurCentre.material.color.set('darkgrey');
-			this.landmark_hipCenter.material.color.set('black');
-		}
+			this.landmark_hipCenter.material.color.set('darkgrey');
+			this.landmark_lateralEpicondyle.material.color.set('black');
+	
 	};
 
 	//Handle onClick Update button
@@ -408,10 +448,18 @@ class CanvasHome extends Component {
 		if(intersects.length > 0 ){
 			// console.log("Ray : ", intersects[0].object.name);
 			if (intersects[0].object?.name === "FemurCentre") {
-				this.handleFemCentre();
+				this.mesh.name = "FemurCentre";
+				this.handleClickOnRadio(event,"FemurCentre");
+
+				console.log("----",this.mesh.name);
 			}
 			else if (intersects[0].object?.name === "HipCentre") {
-				this.handleHipCentre();
+				this.mesh.name = "HipCentre";
+				this.handleClickOnRadio(event,"HipCentre");
+
+				console.log("----",this.mesh.name);
+
+				// this.handleHipCentre();
 			}
 		}
 		else{
@@ -471,12 +519,12 @@ class CanvasHome extends Component {
 				</div>
 
 				{/* Menu */}
-				<div className="leftDiv">
+				<div className="controlPannel">
 
 					{/* Header */}
-					<h1 id="mainlabel">STL File Viewer</h1>
+					<h1 className="title_head">Create Landmarks(Point)</h1>
 					
-					{/* Radio Buttons */}
+					{/* Radio Button - Femur Center*/}
 					<div className='radioOpt'>
 						<input
 							type="radio"
@@ -486,15 +534,32 @@ class CanvasHome extends Component {
 							value="femCentre"
 							style={{height:"14px", width:"14px", cursor: "pointer"}}
 							onChange={()=>{}}
-							onClick={()=> {
-								this.handleFemCentre();
+							onClick={(event)=> {
+								this.handleClickOnRadio(event,"FemurCentre");
 						}}/>
 
 						{/* Label */}
-						<label><b>Femur Centre</b></label><br></br>
+						<label>Femur Centre</label>
 					</div>
 			
-					{/* Radio Buttons */}
+					{/* Radio Button - Hip Center*/}
+					<div className='radioOpt'>
+						<input
+							type="radio"
+							id="hipCentre_id"
+							name="fav_language"
+							className="hipCentre"
+							value="hip"
+							style={{height:"14px", width:"14px", cursor: "pointer"}}
+							onClick={(event)=> {
+								this.handleClickOnRadio(event,"HipCentre");
+						}}/>
+
+						{/* Label */}
+						<label>Hip Centre</label>
+					</div>
+
+					{/* Radio Button - Femur Proximal Canal*/}
 					<div className='radioOpt'>
 						<input
 							type="radio"
@@ -508,15 +573,134 @@ class CanvasHome extends Component {
 						}}/>
 
 						{/* Label */}
-						<label><b>Hip Centre</b></label><br></br>
+						<label>Femur Proximal Canal</label>
 					</div>
 
-					{/* Button Containers */}
+					{/* Radio Button - Femur Distal Canal*/}
+					<div className='radioOpt'>
+					<input
+						type="radio"
+						id="hipCentre_id"
+						name="fav_language"
+						className="hipCentre"
+						value="hip"
+						style={{height:"14px", width:"14px", cursor: "pointer"}}
+						onClick={()=> {
+							this.handleHipCentre();
+						}}/>
+
+						{/* Label */}
+						<label>Femur Distal Canal</label>
+					</div>
+
+					{/* Radio Button - Medial Epicondyle*/}
+					<div className='radioOpt'>
+					<input
+						type="radio"
+						id="hipCentre_id"
+						name="fav_language"
+						className="hipCentre"
+						value="hip"
+						style={{height:"14px", width:"14px", cursor: "pointer"}}
+						onClick={()=> {
+							this.handleHipCentre();
+						}}/>
+
+						{/* Label */}
+						<label>Medial Epicondyle</label>
+					</div>
+
+					{/* Radio Button - Lateral Epicondyle*/}
+					<div className='radioOpt'>
+					<input
+						type="radio"
+						id="lateralEpicondyleID"
+						name="Lateral-Epicondyle"
+						className="lateralEpicondyle"
+						value="hip"
+						style={{height:"14px", width:"14px", cursor: "pointer"}}
+						onClick={()=> {
+							this.handleHipCentre();
+						}}/>
+
+						{/* Label */}
+						<label>Lateral Epicondyle</label>
+					</div>
+
+					{/* Radio Button - Distal Medial Pt*/}
+					<div className='radioOpt'>
+					<input
+						type="radio"
+						id="hipCentre_id"
+						name="fav_language"
+						className="hipCentre"
+						value="hip"
+						style={{height:"14px", width:"14px", cursor: "pointer"}}
+						onClick={()=> {
+							this.handleHipCentre();
+						}}/>
+
+						{/* Label */}
+						<label>Distal Medial Pt</label>
+					</div>
+
+					{/* Radio Button - Distal Lateral Pt*/}
+					<div className='radioOpt'>
+					<input
+						type="radio"
+						id="hipCentre_id"
+						name="fav_language"
+						className="hipCentre"
+						value="hip"
+						style={{height:"14px", width:"14px", cursor: "pointer"}}
+						onClick={()=> {
+							this.handleHipCentre();
+						}}/>
+
+						{/* Label */}
+						<label>Distal Lateral Pt</label>
+					</div>
+
+					{/* Radio Button - Posterior Medial Pt*/}
+					<div className='radioOpt'>
+					<input
+						type="radio"
+						id="hipCentre_id"
+						name="fav_language"
+						className="hipCentre"
+						value="hip"
+						style={{height:"14px", width:"14px", cursor: "pointer"}}
+						onClick={()=> {
+							this.handleHipCentre();
+						}}/>
+
+						{/* Label */}
+						<label>Posterior Medial Pt</label>
+					</div>
+
+					{/* Radio Button - Posterior Lateral Pt*/}
+					<div className='radioOpt'>
+					<input
+						type="radio"
+						id="hipCentre_id"
+						name="fav_language"
+						className="hipCentre"
+						value="hip"
+						style={{height:"14px", width:"14px", cursor: "pointer"}}
+						onClick={()=> {
+							this.handleHipCentre();
+						}}/>
+
+						{/* Label */}
+						<label>Posterior Lateral Pt</label>
+					</div>
+
+					{/* Button Container */}
 					<div className='btn_container'>
 
 						{/* Update Button */}
-						<button id="update_btn_id"
-							className="update_btn btn"
+						<button
+							className="button update_btn btn"
 							style={{cursor: "pointer"}}
 							onClick={()=> {
 								this.handleUpdateBtn();
@@ -525,15 +709,16 @@ class CanvasHome extends Component {
 						</button>
 
 						{/* Show / Hide Button */}
-						<button className="show_btn btn"
-						style={{cursor: "pointer"}}
-						onClick={()=> {
+						{/* <button 
+							className="button show_btn btn"
+							style={{cursor: "pointer"}}
+							onClick={()=> {
 							this.setState({
 								showClipping : !this.state.showClipping
 							})
 							this.handleShowBtn();
 						}}>
-						Show / Hide</button>
+						Show / Hide</button> */}
 					</div> 
 				</div>
 			</div>
