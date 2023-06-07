@@ -7,15 +7,14 @@ import { STLLoader } from 'three/examples/jsm/loaders/STLLoader';
 
 var	orbitControls;
 var	transformControl;
+
 var	objects = [];
 var	line;
-var	plane;
-var	plane_2;
+var plane;
+
 var mesh1,mesh2;
 
 class CanvasHome extends Component {
-	//Local variable declaration
-
 	//Code
 	constructor(props) {
 		super(props);
@@ -31,18 +30,15 @@ class CanvasHome extends Component {
 		
 		this.mesh = null;
 
-		this.landmark_femurCentre	=	null;
-		this.landmark_hipCenter		=	null;
-		this.landmark_lateralEpicondyle	=	null;
-
 		this.points			=	[];
+		this.points1 		=   [];
+		this.points2 		=   [];
+		this.points3 		=   [];
+
 		this.raycaster		=	null;
 		this.pointer		=	null;
 		this.WNDSIZE		=	{ width:0, height: 0};
 
-		this.state	=	{
-			showClipping	:	true
-		};
 	};
 
 	componentDidMount() {
@@ -59,7 +55,7 @@ class CanvasHome extends Component {
 		this.stop();
 	};
 
-	//Initialize App
+	//Initialization
 	initialize = () => {
 		//Scene
 		this.scene = new THREE.Scene();
@@ -81,30 +77,30 @@ class CanvasHome extends Component {
 		//Setting up camera
 		this.setupCamera();
 
-		//Load Model
+		//Loading Model
 		this.loadModel();
 
-		//light
+		//Light
 		this.light = new THREE.HemisphereLight(0xffffbb, 0x080820, 1);
 		this.scene.add(this.light);
 		
-		//Setting up raycaster
+		//Setting up raycaster for click event on Model
 		this.setupRaycaster();
 
 		//Draw Geomtries
 		this.draw();
 
-		//Draw scene
+		//Draw scene / Game loop
 		this.renderScene();
 
 		//Start Animation
 		this.start();
 
+		//Window Events
 		window.addEventListener('keydown', this.keyDown);
-		//Handle Resize
+	
 		window.addEventListener('click', this.onPointerClick);
 
-		//Warm-up resize call
 		window.addEventListener("resize", this.resizeWindow, false);
 
 		//Clear color
@@ -116,17 +112,10 @@ class CanvasHome extends Component {
 		switch(event.keyCode)
 		{
 			case 70:	//F or f
-				if(this[`landmarkMediallDistalPt`]){
-					console.log("-----x ",this[`landmarkMediallDistalPt`].position);
-				
-				}
-		
-
+				// if(this[`landmarkMediallDistalPt`]){
+				// 	console.log("-----x ",this[`landmarkMediallDistalPt`].position);
+				// }
 				break;
-
-			case 72:	//H or h
-				break;
-
 			default:
 				break;
 		}
@@ -135,14 +124,13 @@ class CanvasHome extends Component {
 	//Setting up camera
 	setupCamera = () => {
 		//Code
-		this.camera				=	new THREE.PerspectiveCamera(75 , (this.WNDSIZE.width/this.WNDSIZE.height), 0.1, 1000);
+		this.camera	 =	new THREE.PerspectiveCamera(75 , (this.WNDSIZE.width/this.WNDSIZE.height), 0.1, 1000);
 
 		this.camera.position.set(
 			-79.72404267414048, 
 			66.6783789329992,
 			180.89629390488778);
 
-		// this.camera.quaternion.set();
 		this.camera.lookAt(this.scene.position);
 
 		orbitControls	=	new OrbitControls(this.camera, this.renderer.domElement);
@@ -151,13 +139,9 @@ class CanvasHome extends Component {
 		transformControl.setMode('translate');
 
 		transformControl.addEventListener('dragging-changed', function (event) {
-			if (line != null) {
-				line.visible		=	false;
-				plane.visible		=	false;
-				plane_2.visible		=	false;
-			}
 			orbitControls.enabled = !event.value;
 		});
+		
 
 		this.scene.add(transformControl);
 	};
@@ -169,6 +153,7 @@ class CanvasHome extends Component {
 
 		//Model1 
 		this.Right_FemurModel	=	loader.load('./Right_Femur.stl', ( geometry ) => {
+
 			const material	=	new THREE.MeshPhongMaterial( { color: 0xff5533, specular: 0x111111, shininess: 200 } );
 			mesh2	=	new THREE.Mesh( geometry, material );
 
@@ -176,39 +161,35 @@ class CanvasHome extends Component {
 			mesh2.rotation.set(-(Math.PI / 2), 0, 0);
 			mesh2.scale.set( 0.18, 0.18, 0.18 );
 
-
 			mesh2.name = "Right_Femur_Bone";
 
 			objects.push(mesh2);
 
 			this.scene.add( mesh2 );
 		});
-		// this.Right_FemurModel.rotation.set((Math.PI /2),0,0);
+
 		//Model2
-		// this.Right_TibiaModel	=	loader.load('./Right_Tibia.stl', ( geometry ) => {
-		// 	const material	=	new THREE.MeshPhongMaterial( { color: 0xff5533, specular: 0x111111, shininess: 200 } );
-		// 	 mesh1	=	new THREE.Mesh( geometry, material );
+		this.Right_TibiaModel	=	loader.load('./Right_Tibia.stl', ( geometry ) => {
 
-		// 	 mesh1.position.set( 0,-100, 0);
-		// 	mesh1.rotation.set(-(Math.PI / 2), 0, 0);
-		// 	mesh1.scale.set( 0.18, 0.18, 0.18 );
+			const material	=	new THREE.MeshPhongMaterial( { color: 0xff5533, specular: 0x111111, shininess: 200 } );
+			mesh1	=	new THREE.Mesh( geometry, material );
 
+			mesh1.position.set( 0,-100, 0);
+			mesh1.rotation.set(-(Math.PI / 2), 0, 0);
+			mesh1.scale.set( 0.18, 0.18, 0.18 );
 
-		// 	mesh1.name = "Right_Femur_Bone";
+			mesh1.name = "Right_Femur_Bone";
 
-		// 	objects.push(mesh1);
+			objects.push(mesh1);
 			
-
-		// 	this.scene.add( mesh1 );
-		// });
+			this.scene.add( mesh1 );
+		});
 
 		
 	};	
 
 	//Setting up raycaster
 	setupRaycaster = () => {
-		//Local variable declaration
-
 		//Code
 		this.raycaster = new THREE.Raycaster();
 		this.pointer = new THREE.Vector2();
@@ -216,10 +197,18 @@ class CanvasHome extends Component {
 
 	//Draw Geometries in scene
 	draw = () => {
+		
+		//Drawing Landmarks
+		this.landMarks();
+
+		
+	};
+
+	landMarks = () =>{
 
 		//LANDMARK-Fem Centre
 		this.drawLandMark(new THREE.Vector3(-11.49667183472847, 29.702493960430466, 20.29713010148908), "FemurCentre");
-		
+	
 		//LANDMARK-Hip Centre
 		this.drawLandMark(new THREE.Vector3(-14.586308904469398, 104.37238282070668, 23.174603530337727), "HipCentre");
 
@@ -241,32 +230,33 @@ class CanvasHome extends Component {
 		//LANDMARK- Mediall Distal Pt
 		this.drawLandMark(new THREE.Vector3(-6.370919317447736, 34.5880007282575, 12.328991427522338), "MediallDistalPt");
 
-
-		
-	};
+	}
 
 	//Draw LandMark
 	drawLandMark = (position, name) =>{
+
+		//Sphere Geometry For Landmark
 		const geometry	= new THREE.SphereGeometry( 1.0, 32, 32);
 		this.mesh		= new THREE.Mesh(geometry ,new THREE.MeshBasicMaterial( { color: "grey" } ));
 
+		//Setting the position using parameter
 		this.mesh.position.copy(position);
 		this.mesh.name = name;
 
+		//Setting the mesh name for particular landmark
 		this[`landmark${name}`] = this.mesh;
 
-
+		//Pushing into object array for raycaster
 		objects.push(this[`landmark${name}`]);
 
+		//Adding into the scene
 		this.scene.add(this[`landmark${name}`]);
 		this[`landmark${name}`].visible = false;
+
 	}
 
 	//Start Animation
 	start = () => {
-		//Local variable declaration
-
-		//Code
 		//if already initalized then leave it be
 		if(!this.frameId) {
 			this.frameId = requestAnimationFrame(this.update);
@@ -275,8 +265,6 @@ class CanvasHome extends Component {
 
 	//Stop render loop
 	stop = () => {
-		//Local variable declaration
-
 		//Code
 		cancelAnimationFrame(this.frameId);
 	};
@@ -300,8 +288,6 @@ class CanvasHome extends Component {
 
 	//Game-loop
 	update = () => {
-		//Local variable declaration
-
 		//Code
 		orbitControls.update();
 		this.renderScene();
@@ -309,12 +295,16 @@ class CanvasHome extends Component {
 		this.frameId = window.requestAnimationFrame(this.update);
 	};
 
+	//Creation of landmark on clicking redio button
 	handleClickOnRadio = (event,name) =>{
+
 		//code
 		console.log("---------------",this[`landmark${name}`].name);
 
 		//FemurCenter
 		if(name === "FemurCentre"){
+			
+			this.drawLandMark(new THREE.Vector3(-11.49667183472847, 29.702493960430466, 20.29713010148908), "FemurCentre");
 
 			transformControl.attach(this[`landmark${name}`]);
 			this[`landmark${name}`].material.color.set("black");
@@ -456,67 +446,76 @@ class CanvasHome extends Component {
 
 	//Handle onClick Update button
 	handleUpdateBtn = () => {
-		//Local variable declaration
-		let geometryLine, materialLine;
-		let geometryPlane, materialPlane;
-		let geometryPlane2, materialPlane2;
-
 		//Code
 		console.log("Check : ", line);
-		if (line != null) {
-			line.visible		=	false;
-			plane.visible		=	false;
-			plane_2.visible	=	false;
-		}
 
-		this.landmark_femurCentre.visible	=	true;
-		this.landmark_hipCenter.visible	=	true;
-		this.landmark_femurCentre.material.color.set('black');
-		this.landmark_hipCenter.material.color.set('black');
+		transformControl.detach(this[`landmarkFemurCentre`]);
+		transformControl.detach(this[`landmarkHipCentre`]);
 
-		transformControl.detach(this.landmark_femurCentre);
-		transformControl.detach(this.landmark_hipCenter);
+		this.points.push(this[`landmarkFemurCentre`].position);
+		this.points.push(this[`landmarkHipCentre`].position);
 
-		this.points.push(this.landmark_femurCentre.position);
-		this.points.push(this.landmark_hipCenter.position);
+		this.points1.push(this[`landmarkMedialEpicondyle`].position);
+		this.points1.push(this[`landmarkLateralEpicondyle`].position);
 
-		geometryLine	=	new THREE.BufferGeometry().setFromPoints( this.points );
-		materialLine	=	new THREE.LineBasicMaterial( { color: 0x0000ff } );
+		this.points2.push(this[`landmarkPosteriorMedialPt`].position);
+		this.points2.push(this[`landmarkPosteriorLateralPt`].position);
 
-		line			=	new THREE.Line( geometryLine, materialLine );
-		line.visible	=	true;
-		this.scene.add(line);
 
-		geometryPlane	=	new THREE.PlaneGeometry( 50, 50 );
-		materialPlane =	new THREE.MeshBasicMaterial( {color: 'grey', side: THREE.DoubleSide} );
+		this.drawLine(this.points,"line1");
+		this.drawLine(this.points1,"line2");
+		this.drawLine(this.points2,"line3");
 
-		plane = new THREE.Mesh( geometryPlane, materialPlane );
-		plane.position.x	=	this.points[1].x;
-		plane.position.y	=	this.points[1].y;
-		plane.position.z	=	this.points[1].z;
 
-		plane.visible	=	true;
-		plane.lookAt(this.points[0]);
-		this.scene.add( plane );
+		let lineDir = new THREE.Vector3();
+		lineDir.subVectors(this.points[1],this.points[0]).normalize();
 
-		geometryPlane2	= new THREE.PlaneGeometry( 50, 50 );
-		materialPlane2	= new THREE.MeshBasicMaterial( {color: 'darkgrey', side: THREE.DoubleSide} );
+		let planeGeo = new THREE.PlaneGeometry(20,20);
 
-		plane_2 = new THREE.Mesh( geometryPlane2, materialPlane2 );
-		plane_2.position.x	=	(this.points[1].x);
-		plane_2.position.y	=	(this.points[1].y);
-		plane_2.position.z	=	(this.points[1].z);
+		let planeMat = new THREE.MeshBasicMaterial({ color: 0x00ff00, side: THREE.DoubleSide });
+		plane = new THREE.Mesh(planeGeo, planeMat);
 
-		plane_2.translateOnAxis(new THREE.Vector3(0, 2, 0), 1.5);
+		plane.position.copy(this.points[0]);;
+		plane.lookAt(this.points[1]);
+		
+		this.scene.add(plane);
 
-		plane_2.visible  = true;
-		plane_2.lookAt(this.points[0]);
-		this.scene.add(plane_2);
+		/**- For Cliping -**/
+		const clippingPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), plane.position.y);
+
+		mesh2.traverse((child) => {
+			console.log("--=-=-=-==-----",child);
+			if (child.isMesh) {
+				child.material.clippingPlanes = [clippingPlane];
+				child.material.clipIntersection = true;
+				child.material.needsUpdate = true;
+			  }
+		  });
+		
 	};
+
+	//Drawing Line
+	drawLine = (pts,name) =>{
+		//code
+		let geometryLine, materialLine;
+
+		geometryLine = new THREE.BufferGeometry().setFromPoints( pts );
+		materialLine = new THREE.LineBasicMaterial( { 
+										color: 0xff00ff, 
+										linewidth: 20,
+										side: THREE.DoubleSide, 
+										depthWrite: true
+									} );
+
+		this[`${name}`] = new THREE.Line( geometryLine, materialLine );
+		// line.visible	=	true;
+
+		this.scene.add(this[`${name}`]);
+
+	}
 
 	//Handle onPointer event
 	onPointerClick = (event) => {
-		//Local variable declaration
 
 		//Code
 		this.pointer.x	=	(event.clientX / window.innerWidth) * 2 - 1;
@@ -583,72 +582,49 @@ class CanvasHome extends Component {
 		}
 		else{
 			// transformControl.detach(this.mesh);
-		
-		}
-	};
-
-	//Handle onClick Show/Hide button
-	handleShowBtn = () => {
-		//Local variable declaration
-
-		//Code
-		if (this.state.showClipping === true) {
-			if(plane){
-				var globalPlane	=	new THREE.Plane( new THREE.Vector3( 0, 1,0 ), this.distanceVector((new THREE.Vector3(0,0,0)),(this.landmark_hipCenter.position)));
-				this.renderer.clippingPlanes = [ globalPlane ];
-			}
-		}
-		else{
-			this.renderer.clippingPlanes.pop();
 		}
 	};
 
 	//Handle Reset
 	handleReset = () =>{
-			this[`landmarkHipCentre`].visible = false;
-			this[`landmarkLateralEpicondyle`].visible = false;
-			this[`landmarkMedialEpicondyle`].visible = false;
-			this[`landmarkPosteriorMedialPt`].visible = false;
-			this[`landmarkPosteriorLateralPt`].visible = false;
-			this[`landmarkLateralDistalPt`].visible = false;
-			this[`landmarkMediallDistalPt`].visible = false;
-			this[`landmarkFemurCentre`].visible = false;
+		//Code
+		this[`landmarkHipCentre`].visible = false;
+		this[`landmarkLateralEpicondyle`].visible = false;
+		this[`landmarkMedialEpicondyle`].visible = false;
+		this[`landmarkPosteriorMedialPt`].visible = false;
+		this[`landmarkPosteriorLateralPt`].visible = false;
+		this[`landmarkLateralDistalPt`].visible = false;
+		this[`landmarkMediallDistalPt`].visible = false;
+		this[`landmarkFemurCentre`].visible = false;
 
-			transformControl.detach(this.mesh);
+		transformControl.detach(this.mesh);
 
-			let Rbtn = document.getElementsByName("fav_language");
-			for(let i = 0; i < Rbtn.length; i++){
-				if(Rbtn[i].checked)
-				{
-					Rbtn[i].checked = false;
-				}
+		let Rbtn = document.getElementsByName("fav_language");
+
+		for(let i = 0; i < Rbtn.length; i++){
+			if(Rbtn[i].checked)
+			{
+				Rbtn[i].checked = false;
 			}
-			console.log("0o0----",Rbtn.length);
-
-
+		}
+		if(this[`line1`] && this[`line2`] && this[`line3`]){
+			this.scene.remove(this[`line1`] );
+			this.scene.remove(this[`line2`] );
+			this.scene.remove(this[`line3`] );
+		}
+		
+		if(plane){
+			this.scene.remove(plane);
+		}
+		
 	}
 
 	renderScene = () => {
-		//Local variable declaration
-
 		//Code
 		let { renderer, scene, camera, } = this;
 		if(renderer) {
 			renderer.render(scene, camera);
 		}
-	};
-
-	//Function to calculate distance between two 3D points
-	distanceVector = ( v1, v2 )=>{
-		//Local variable declaration
-
-		//Code
-		v1	=	new THREE.Vector3(0,0,0);
-		var dx	=	v1.x - v2.x;
-		var dy	=	v1.y - v2.y;
-		var dz	=	v1.z - v2.z;
-
-		return Math.sqrt( dx * dx + dy * dy + dz * dz );
 	};
 
 	render() {
@@ -661,8 +637,7 @@ class CanvasHome extends Component {
 						id='mainC'
 						style={{height:"100vh"}}/>
 				</div>
-
-				{/* Menu */}
+				{/* Control Pannel / Radio Buttons */}
 				<div className="controlPannel">
 
 					{/* Header */}
@@ -707,10 +682,10 @@ class CanvasHome extends Component {
 					<div className='radioOpt'>
 						{/* <input
 							type="radio"
-							id="hipCentre_id"
+							id="FemurProximalCanal_id"
 							name="fav_language"
-							className="hipCentre"
-							value="hip"
+							className="FemurProximalCanal"
+							value="FemurProximalCanal"
 							style={{height:"14px", width:"14px", cursor: "pointer"}}
 							onClick={(event)=> {
 								this.handleClickOnRadio(event,"FemurProximalCanal");
@@ -725,10 +700,10 @@ class CanvasHome extends Component {
 					<div className='radioOpt'>
 					{/* <input
 						type="radio"
-						id="hipCentre_id"
+						id="FemurDistalCanal_id"
 						name="fav_language"
-						className="hipCentre"
-						value="hip"
+						className="FemurDistalCanal"
+						value="FemurDistalCanal"
 						style={{height:"14px", width:"14px", cursor: "pointer"}}
 						onClick={(event)=> {
 							this.handleClickOnRadio(event,"FemurDistalCanal");
@@ -762,7 +737,7 @@ class CanvasHome extends Component {
 						id="lateralEpicondyleID"
 						name="fav_language"
 						className="lateralEpicondyle"
-						value="hip"
+						value="LateralEpicondyle"
 						style={{height:"14px", width:"14px", cursor: "pointer"}}
 						onClick={(event)=> {
 							this.handleClickOnRadio(event,"LateralEpicondyle");
@@ -776,10 +751,10 @@ class CanvasHome extends Component {
 					<div className='radioOpt'>
 					<input
 						type="radio"
-						id="hipCentre_id"
+						id="MediallDistalPtID"
 						name="fav_language"
-						className="hipCentre"
-						value="hip"
+						className="MediallDistalPt"
+						value="MediallDistalPt"
 						style={{height:"14px", width:"14px", cursor: "pointer"}}
 						onClick={(event)=> {
 							this.handleClickOnRadio(event,"MediallDistalPt");
@@ -794,10 +769,10 @@ class CanvasHome extends Component {
 					<div className='radioOpt'>
 					<input
 						type="radio"
-						id="hipCentre_id"
+						id="LateralDistalPtID"
 						name="fav_language"
-						className="hipCentre"
-						value="hip"
+						className="LateralDistalPt"
+						value="LateralDistalPt"
 						style={{height:"14px", width:"14px", cursor: "pointer"}}
 						onClick={(event)=> {
 							this.handleClickOnRadio(event,"LateralDistalPt");
@@ -812,10 +787,10 @@ class CanvasHome extends Component {
 					<div className='radioOpt'>
 					<input
 						type="radio"
-						id="hipCentre_id"
+						id="PosteriorMedialPtID"
 						name="fav_language"
-						className="hipCentre"
-						value="hip"
+						className="PosteriorMedialPt"
+						value="PosteriorMedialPt"
 						style={{height:"14px", width:"14px", cursor: "pointer"}}
 						onClick={(event)=> {
 							this.handleClickOnRadio(event,"PosteriorMedialPt");
@@ -829,10 +804,10 @@ class CanvasHome extends Component {
 					<div className='radioOpt'>
 					<input
 						type="radio"
-						id="hipCentre_id"
+						id="PosteriorLateralPtID"
 						name="fav_language"
-						className="hipCentre"
-						value="hip"
+						className="PosteriorLateralPt"
+						value="PosteriorLateralPt"
 						style={{height:"14px", width:"14px", cursor: "pointer"}}
 						onClick={(event)=> {
 							this.handleClickOnRadio(event,"PosteriorLateralPt");
@@ -855,7 +830,7 @@ class CanvasHome extends Component {
 							Update	
 						</button>
 
-						{/* Show / Hide Button */}
+						{/* Reset Button */}
 						<button 
 							className="button show_btn btn"
 							style={{cursor: "pointer"}}
