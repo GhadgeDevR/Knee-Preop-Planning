@@ -30,46 +30,45 @@ canvas{
 	height: 100%;
 }
 
-h1{
-	width: 100%;
-	display: flex;
-	font-size: 29px;
-	justify-content: center;
-	align-items: center;
-}
-
 .femCentre,
 .hipCentre {
 	accent-color: black;
 }
 
-.radioOpt{
-	height: 15%;
-	width: 100%;
-	padding: 2%;
-}
 
 canvas { 
 	width: 100% !important;
 	height: 100% !important;
 }
 
-#mainLabel {
-	margin-top: 15px;
-	margin-bottom: 50px;
-}
 
-.leftDiv {
-	height: 25vh;
+.controlPannel {
+	height: 90vh;
 	width: 22vw;
-	left: 1%;
-	top: 2%;
-	background: #ffffff59;
-	font-size: 11px;
-	padding: 2%;
+	
+	/* background: #ea262659; */
+	font-size: 8px;
+	padding: 1%;
+
 	position: absolute;
 	z-index: 1;
+	left: 1%;
+	top: 2%;
+
+	display: flex;
+	flex-direction: column;
 }
+
+.title_head {
+	margin: 5%;
+	font-size: 1.3rem;
+}
+
+.radioOpt{
+	width: 100%;
+	color: rgb(105, 101, 101);
+}
+
 
 label{
 	height: 0px;
@@ -78,13 +77,16 @@ label{
 	padding-left: 18px;
 }
 
-.btn{
-	height: 40%;
+.button{
+	height: 50%;
 	margin: 5%;
 	width: 40%;
 }
 
 .btn_container{
 	width: 100%;
-	height: 49%;
+	height: 10%;
+	display: flex;
+	flex-direction: row;
+	/* background-color: aqua; */
 }
