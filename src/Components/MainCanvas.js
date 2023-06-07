@@ -102,7 +102,7 @@ class CanvasHome extends Component {
 
 		window.addEventListener('keydown', this.keyDown);
 		//Handle Resize
-		window.addEventListener('click', this.onPointerMove);
+		window.addEventListener('click', this.onPointerClick);
 
 		//Warm-up resize call
 		window.addEventListener("resize", this.resizeWindow, false);
@@ -116,8 +116,8 @@ class CanvasHome extends Component {
 		switch(event.keyCode)
 		{
 			case 70:	//F or f
-				if(this.landmark_lateralEpicondyle){
-					console.log("-----x ",this.landmark_lateralEpicondyle.position);
+				if(this[`landmarkMedialEpicondyle`]){
+					console.log("-----x ",this[`landmarkMedialEpicondyle`].position);
 				
 				}
 		
@@ -185,22 +185,22 @@ class CanvasHome extends Component {
 		});
 		// this.Right_FemurModel.rotation.set((Math.PI /2),0,0);
 		//Model2
-		this.Right_TibiaModel	=	loader.load('./Right_Tibia.stl', ( geometry ) => {
-			const material	=	new THREE.MeshPhongMaterial( { color: 0xff5533, specular: 0x111111, shininess: 200 } );
-			 mesh1	=	new THREE.Mesh( geometry, material );
+		// this.Right_TibiaModel	=	loader.load('./Right_Tibia.stl', ( geometry ) => {
+		// 	const material	=	new THREE.MeshPhongMaterial( { color: 0xff5533, specular: 0x111111, shininess: 200 } );
+		// 	 mesh1	=	new THREE.Mesh( geometry, material );
 
-			 mesh1.position.set( 0,-100, 0);
-			mesh1.rotation.set(-(Math.PI / 2), 0, 0);
-			mesh1.scale.set( 0.18, 0.18, 0.18 );
+		// 	 mesh1.position.set( 0,-100, 0);
+		// 	mesh1.rotation.set(-(Math.PI / 2), 0, 0);
+		// 	mesh1.scale.set( 0.18, 0.18, 0.18 );
 
 
-			mesh1.name = "Right_Femur_Bone";
+		// 	mesh1.name = "Right_Femur_Bone";
 
-			objects.push(mesh1);
+		// 	objects.push(mesh1);
 			
 
-			this.scene.add( mesh1 );
-		});
+		// 	this.scene.add( mesh1 );
+		// });
 
 		
 	};
@@ -222,9 +222,6 @@ class CanvasHome extends Component {
 
 	//Draw Geometries in scene
 	draw = () => {
-		//Local variable declaration
-		const geometry_L2		=	new THREE.SphereGeometry( 1.5, 32, 32);
-		const material_L2		=	new THREE.MeshBasicMaterial( { color: "grey" } );
 
 		//LANDMARK-Fem Centre
 		this.drawLandMark(new THREE.Vector3(-11.49667183472847, 29.702493960430466, 20.29713010148908), "FemurCentre");
@@ -232,23 +229,19 @@ class CanvasHome extends Component {
 		//LANDMARK-Hip Centre
 		this.drawLandMark(new THREE.Vector3(-14.586308904469398, 104.37238282070668, 23.174603530337727), "HipCentre");
 
-		//LANDMARK-Hip Centre
-		this.drawLandMark(new THREE.Vector3(-10.586308904469398, 104.37238282070668, 23.174603530337727), "LateralEpicondyle");
+		//LANDMARK-Lateral Epicondyle
+		this.drawLandMark(new THREE.Vector3(-17.24426874048524, 33.839616587639775, 17.65649309695238), "LateralEpicondyle");
 
+		//LANDMARK-Medial Epicondyle
+		this.drawLandMark(new THREE.Vector3(-3.5751411752251343, 32.01034502005889, 12.954036230043911), "MedialEpicondyle");
 
-		//LANDMARK-Hip Centre
-		this.landmark_lateralEpicondyle		=	new THREE.Mesh(geometry_L2, material_L2);
-		this.landmark_lateralEpicondyle.name	=	"LateralEpicondyle";
-		this.landmark_lateralEpicondyle.position.set(-10.586308904469398, 104.37238282070668, 23.174603530337727);
-		objects.push(this.landmark_lateralEpicondyle);
-		this.scene.add(this.landmark_lateralEpicondyle);
 
 		
 	};
 
 	//Draw LandMark
 	drawLandMark = (position, name) =>{
-		const geometry	= new THREE.SphereGeometry( 1.5, 32, 32);
+		const geometry	= new THREE.SphereGeometry( 1.0, 32, 32);
 		this.mesh		= new THREE.Mesh(geometry ,new THREE.MeshBasicMaterial( { color: "grey" } ));
 
 		this.mesh.position.copy(position);
@@ -311,61 +304,51 @@ class CanvasHome extends Component {
 
 	handleClickOnRadio = (event,name) =>{
 		//code
-			console.log("---------------",this[`landmark${name}`].name);
-		if(name = "FemurCentre"){
-			console.log("-----111111-");
-		
-			this[`landmark${name}`].material.color.set("red");
+		console.log("---------------",this[`landmark${name}`].name);
+
+		if(name === "FemurCentre"){
+
 			transformControl.attach(this[`landmark${name}`]);
+			this[`landmark${name}`].material.color.set("black");
+
+			this[`landmarkHipCentre`].material.color.set("grey");
+			this[`landmarkLateralEpicondyle`].material.color.set("grey");
+
+
 		}
-		else if(name = "HipCentre"){
-			console.log("-----222222222-");
-			this[`landmark${name}`].material.color.set("green");
+		else if(name === "HipCentre"){
+
 			transformControl.attach(this[`landmark${name}`]);
+			this[`landmark${name}`].material.color.set("black");
+
+			this[`landmarkFemurCentre`].material.color.set("grey");
+			this[`landmarkLateralEpicondyle`].material.color.set("grey");
+			this[`landmarkMedialEpicondyle`].material.color.set("grey");
+
+
+		}
+		else if(name === "LateralEpicondyle"){
+			
+			transformControl.attach(this[`landmark${name}`]);
+			this[`landmark${name}`].material.color.set("black");
+
+			this[`landmarkFemurCentre`].material.color.set("grey");
+			this[`landmarkHipCentre`].material.color.set("grey");
+			this[`landmarkMedialEpicondyle`].material.color.set("grey");
+
+
+		}
+		else if(name === "MedialEpicondyle"){
+			
+			transformControl.attach(this[`landmark${name}`]);
+			this[`landmark${name}`].material.color.set("black");
+
+			this[`landmarkFemurCentre`].material.color.set("grey");
+			this[`landmarkHipCentre`].material.color.set("grey");
+			this[`landmarkLateralEpicondyle`].material.color.set("grey");
+
 		}
 	}
-
-	//Handle onClick Femur button
-	handleFemCentre = (event) => {
-		//Code
-		this.landmark_femurCentre.material.color.set('black');
-		
-		transformControl.attach(this.landmark_femurCentre);
-		
-		// this.landmark_femurCentre.material.color.set('black');
-		// this.landmark_hipCenter.material.color.set('darkgrey');
-		// this.landmark_lateralEpicondyle.material.color.set('darkgrey');
-		
-	};
-
-	//Handle onClick Hip button
-	handleHipCentre = () => {
-		//Code
-		this.landmark_hipCenter.material.color.set('black');
-		
-		transformControl.attach(this.landmark_hipCenter);
-		
-		// this.landmark_hipCenter.material.color.set('black');
-		// this.landmark_femurCentre.material.color.set('darkgrey');
-		// this.landmark_lateralEpicondyle.material.color.set('darkgrey');
-
-		
-	};
-
-	//Handle onClick Lateral Epicondyle
-	handleLateralEpicondyle = () => {
-		//Code
-		this.landmark_lateralEpicondyle.visible	=	true;
-		this.landmark_lateralEpicondyle.material.color.set('black');
-
-		transformControl.attach(this.landmark_lateralEpicondyle);
-
-		
-			this.landmark_femurCentre.material.color.set('darkgrey');
-			this.landmark_hipCenter.material.color.set('darkgrey');
-			this.landmark_lateralEpicondyle.material.color.set('black');
-	
-	};
 
 	//Handle onClick Update button
 	handleUpdateBtn = () => {
@@ -432,7 +415,7 @@ class CanvasHome extends Component {
 	};
 
 	//Handle onPointer event
-	onPointerMove = (event) => {
+	onPointerClick = (event) => {
 		//Local variable declaration
 
 		//Code
@@ -446,20 +429,28 @@ class CanvasHome extends Component {
 		const intersects	=	this.raycaster.intersectObjects(objects	,true);
 
 		if(intersects.length > 0 ){
-			// console.log("Ray : ", intersects[0].object.name);
 			if (intersects[0].object?.name === "FemurCentre") {
+
 				this.mesh.name = "FemurCentre";
 				this.handleClickOnRadio(event,"FemurCentre");
 
-				console.log("----",this.mesh.name);
 			}
 			else if (intersects[0].object?.name === "HipCentre") {
+
 				this.mesh.name = "HipCentre";
 				this.handleClickOnRadio(event,"HipCentre");
+			}
+			else if (intersects[0].object?.name === "LateralEpicondyle") {
 
-				console.log("----",this.mesh.name);
+				this.mesh.name = "LateralEpicondyle";
+				this.handleClickOnRadio(event,"LateralEpicondyle");
 
-				// this.handleHipCentre();
+			}
+			else if (intersects[0].object?.name === "MedialEpicondyle") {
+
+				this.mesh.name = "MedialEpicondyle";
+				this.handleClickOnRadio(event,"MedialEpicondyle");
+
 			}
 		}
 		else{
@@ -569,7 +560,7 @@ class CanvasHome extends Component {
 							value="hip"
 							style={{height:"14px", width:"14px", cursor: "pointer"}}
 							onClick={()=> {
-								this.handleHipCentre();
+								// this.handleHipCentre();
 						}}/>
 
 						{/* Label */}
@@ -602,8 +593,8 @@ class CanvasHome extends Component {
 						className="hipCentre"
 						value="hip"
 						style={{height:"14px", width:"14px", cursor: "pointer"}}
-						onClick={()=> {
-							this.handleHipCentre();
+						onClick={(event)=> {
+							this.handleClickOnRadio(event,"MedialEpicondyle");
 						}}/>
 
 						{/* Label */}
@@ -615,12 +606,12 @@ class CanvasHome extends Component {
 					<input
 						type="radio"
 						id="lateralEpicondyleID"
-						name="Lateral-Epicondyle"
+						name="fav_language"
 						className="lateralEpicondyle"
 						value="hip"
 						style={{height:"14px", width:"14px", cursor: "pointer"}}
-						onClick={()=> {
-							this.handleHipCentre();
+						onClick={(event)=> {
+							this.handleClickOnRadio(event,"LateralEpicondyle");
 						}}/>
 
 						{/* Label */}
